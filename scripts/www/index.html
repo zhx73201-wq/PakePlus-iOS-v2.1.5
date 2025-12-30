@@ -1,88 +1,464 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="./static/css/styles.css" />
-        <meta
-            http-equiv="Content-Security-Policy"
-            content="default-src * 'unsafe-inline' 'unsafe-eval'"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Tauri App</title>
-        <script src="./static/js/main.js"></script>
-    </head>
-    <body>
-        <main class="container">
-            <h1>Welcome to TauriMan</h1>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZHX732 网站发布页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 0 15px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            border-radius: 2px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+        
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        #searchInput:focus {
+            outline: none;
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        
+        .category-btn {
+            padding: 10px 24px;
+            background-color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .category-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-btn.active {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            color: white;
+        }
+        
+        .websites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .website-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .website-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            padding: 20px;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .website-icon {
+            font-size: 1.8rem;
+            margin-right: 15px;
+            color: #3498db;
+        }
+        
+        .website-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .card-body {
+            padding: 20px;
+            flex-grow: 1;
+        }
+        
+        .website-desc {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .card-footer {
+            padding: 15px 20px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+        
+        .website-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .website-link:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .website-category {
+            display: inline-block;
+            padding: 5px 12px;
+            background-color: #e9f7fe;
+            color: #3498db;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .stats {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stats p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+        }
+        
+        .stats span {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: #95a5a6;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .websites-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .categories {
+                gap: 8px;
+            }
+            
+            .category-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .websites-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+		img {
+			vertical-align: middle;
+		}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1></i><img src="title.png" width="75" height="75"> 网站发布页</h1>
+            <p class="subtitle">ZHX732</p>
+        </header>
+        
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="搜索网站名称或描述...">
+        </div>
+        
+        <div class="categories">
+            <button class="category-btn active" data-category="all">全部网站</button>
+            <button class="category-btn" data-category="main">主站</button>
+            <button class="category-btn" data-category="poll">问卷</button>
+            <button class="category-btn" data-category="AI">AI相关</button>
+            <!-- <button class="category-btn" data-category="development">开发技术</button> -->
+            <!-- <button class="category-btn" data-category="design">设计资源</button> -->
+            <!-- <button class="category-btn" data-category="tools">在线工具</button> -->
+            <!-- <button class="category-btn" data-category="learning">学习平台</button> -->
+            <button class="category-btn" data-category="productivity">效率工具</button>
+        </div>
+        
+        <div class="websites-grid" id="websitesContainer">
+            <!-- 网站卡片将通过JavaScript动态生成 -->
+        </div>
+        
+        <div class="stats">
+            <p>共收录 <span id="totalCount">0</span> 个优质网站，<span id="visibleCount">0</span> 个符合当前筛选条件</p>
+        </div>
+        
+        <footer>
+            <p>网站发布页</p>
+        </footer>
+    </div>
 
-            <div class="row">
-                <a
-                    href="https://tauri.app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <img
-                        src="./assets/tauri.svg"
-                        class="logo tauri"
-                        alt="Tauri logo"
-                    />
-                </a>
-                <a
-                    href="https://pakeplus.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <img
-                        src="https://hk.gh-proxy.org/https://github.com/Sjj1024/PakePlus/blob/main/app-icon.png"
-                        class="logo vanilla"
-                        alt="JavaScript logo"
-                    />
-                </a>
-            </div>
-            <p>Click to get data</p>
-            <form class="row" id="greet-form">
-                <input id="greet-input" placeholder="Enter a name..." />
-                <button type="submit" id="getdata">GET DATA</button>
-            </form>
-            <div class="functions">
-                <a href="./book.html" target="_self">跳转到book.html</a>
-                <a
-                    href="https://www.baidu.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >跳到百度blank
-                </a>
-                <a
-                    href="https://www.baidu.com"
-                    target="_self"
-                    rel="noopener noreferrer"
-                >
-                    跳到百度self
-                </a>
-                <button onclick="sayHello()">点击我</button>
-                <button onclick="sayHello()">下载文件</button>
-                <button onclick="sayHello()">上传文件</button>
-                <button onclick="sayHello()">访问相机</button>
-                <button onclick="sayHello()">访问麦克风</button>
-                <button onclick="sayHello()">访问相册</button>
-                <button class="btn" onclick="openWechat()">打开微信</button>
-                <button class="btn" onclick="openWechatScan()">
-                    打开扫一扫
-                </button>
-                <button class="btn" onclick="openZhihu()">打开知乎</button>
-                <button onclick="sayHello()">打开抖音</button>
-                <button onclick="sayHello()">用浏览器打开</button>
-                <button>打开知乎</button>
-            </div>
-            <p id="greet-msg"></p>
-            <img src="./static/image/cursor.jpeg" alt="logo" />
-            <video
-                src="https://hk.gh-proxy.org/https://github.com/Sjj1024/PakePlus/blob/main/docs/static/videos/pakeplus.mp4"
-                autoplay
-                controls
-                style="width: 100%; height: 100%"
-            ></video>
-            <audio src="./static/music/yin.mp3" controls></audio>
-        </main>
-    </body>
+    <script>
+        // 网站数据
+        const websites = [
+            {
+                name: "ZHX732 旅游日志",
+                url: "https://zhx732.cn/",
+                description: "个人网站主页，包含个人博客、个人项目、相关工具等。",
+                category: "main",
+                icon: "fas fa-globe"
+            },
+            {
+                name: "个人记录",
+                url: "https://zhx732.cn/index.php/2025/06/24/trace/",
+                description: "个人网站主页，包含个人博客、个人项目、相关工具等。",
+                category: "main",
+                icon: "fa fa-map"
+            },
+            {
+                name: "个人问卷系统",
+                url: "https://poll_from_zhx.zhx732.cn/",
+                description: "个人调查问卷网址，不定期开放，欢迎参与调查问卷。",
+                category: "poll",
+                icon: "fa fa-question-circle"
+            },
+            {
+                name: "To Do Percent",
+                url: "https://zhx732.cn/index.php/2025/08/20/ai-web%e9%a1%b9%e7%9b%ae%e4%b9%8b-to-do-percent/",
+                description: "一个实验性AI预测做事成功率的网站（域名仅面向有需求之人开放）",
+                category: "AI",
+                icon: "fa fa-tachometer"
+            },
+            {
+                name: "翻译工具",
+                url: "https://zhx732.cn/index.php/2025/08/01/%e6%9c%ac%e5%9c%b0%e5%ae%9e%e6%97%b6%e7%bf%bb%e8%af%91%e5%b7%a5%e5%85%b7/",
+                description: "本地模型实时翻译记录工具（可自定义语言模型，仅限Windows）",
+                category: "productivity",
+                icon: "fa fa-window-maximize"
+            }
+        ];
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const websitesContainer = document.getElementById('websitesContainer');
+            const searchInput = document.getElementById('searchInput');
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const totalCountElement = document.getElementById('totalCount');
+            const visibleCountElement = document.getElementById('visibleCount');
+            
+            // 初始化显示所有网站
+            totalCountElement.textContent = websites.length;
+            displayWebsites(websites);
+            updateVisibleCount(websites.length);
+            
+            // 搜索功能
+            searchInput.addEventListener('input', function() {
+                filterWebsites();
+            });
+            
+            // 分类筛选功能
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的active类
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    // 为当前点击的按钮添加active类
+                    this.classList.add('active');
+                    filterWebsites();
+                });
+            });
+            
+            function displayWebsites(websitesToDisplay) {
+                websitesContainer.innerHTML = '';
+                
+                if (websitesToDisplay.length === 0) {
+                    websitesContainer.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><p>未找到匹配的网站，请尝试其他搜索关键词</p></div>';
+                    updateVisibleCount(0);
+                    return;
+                }
+                
+                websitesToDisplay.forEach(website => {
+                    const websiteCard = document.createElement('div');
+                    websiteCard.className = 'website-card';
+                    
+                    // 类别颜色映射
+                    const categoryColors = {
+                        'development': '#3498db',
+                        'design': '#9b59b6',
+                        'tools': '#e74c3c',
+                        'learning': '#2ecc71',
+                        'productivity': '#f39c12',
+						'main':'#0009FF',
+						'poll':'#66DA00',
+						'AI':'#00C4FF'
+                    };
+                    
+                    websiteCard.innerHTML = `
+                        <div class="card-header">
+                            <div style="display: flex; align-items: center;">
+                                <i class="${website.icon} website-icon"></i>
+                                <div class="website-name">${website.name}</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <span class="website-category" style="background-color: ${categoryColors[website.category] || '#95a5a6'}20; color: ${categoryColors[website.category] || '#95a5a6'}">
+                                ${getCategoryName(website.category)}
+                            </span>
+                            <p class="website-desc">${website.description}</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="${website.url}" target="_blank" class="website-link">
+                                <i class="fas fa-external-link-alt"></i> 访问网站
+                            </a>
+                        </div>
+                    `;
+                    
+                    websitesContainer.appendChild(websiteCard);
+                });
+                
+                updateVisibleCount(websitesToDisplay.length);
+            }
+            
+            function filterWebsites() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const activeCategory = document.querySelector('.category-btn.active').getAttribute('data-category');
+                
+                const filteredWebsites = websites.filter(website => {
+                    const matchesSearch = website.name.toLowerCase().includes(searchTerm) || 
+                                         website.description.toLowerCase().includes(searchTerm);
+                    const matchesCategory = activeCategory === 'all' || website.category === activeCategory;
+                    
+                    return matchesSearch && matchesCategory;
+                });
+                
+                displayWebsites(filteredWebsites);
+            }
+            
+            function getCategoryName(categoryCode) {
+                const categoryNames = {
+                    'development': '开发技术',
+                    'design': '设计资源',
+                    'tools': '在线工具',
+                    'learning': '学习平台',
+                    'productivity': '效率工具',
+					'main':'主站',
+					'poll':'问卷',
+					'AI':'AI相关'
+                };
+                
+                return categoryNames[categoryCode] || categoryCode;
+            }
+            
+            function updateVisibleCount(count) {
+                visibleCountElement.textContent = count;
+            }
+        });
+    </script>
+</body>
 </html>
