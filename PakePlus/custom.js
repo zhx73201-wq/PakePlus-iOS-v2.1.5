@@ -1,5 +1,33 @@
-window.addEventListener("DOMContentLoaded",()=>{const t=document.createElement("script");t.src="https://www.googletagmanager.com/gtag/js?id=G-W5GKHM0893",t.async=!0,document.head.appendChild(t);const n=document.createElement("script");n.textContent="window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-W5GKHM0893');",document.body.appendChild(n)});// very important, if you don't know what it is, don't touch it
-// 非常重要，不懂代码不要动，这里可以解决80%的问题，也可以生产1000+的bug
+window.addEventListener("DOMContentLoaded",()=>{const t=document.createElement("script");t.src="https://www.googletagmanager.com/gtag/js?id=G-W5GKHM0893",t.async=!0,document.head.appendChild(t);const n=document.createElement("script");n.textContent="window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-W5GKHM0893');",document.body.appendChild(n)});// 判断系统类型
+
+// function getSystemType() {
+//     const ua = navigator.userAgent;
+//     const platform = navigator.platform;
+//     // iOS（包含 iPhone / iPad / iPod）
+//     if (/iPhone|iPad|iPod/i.test(ua)) {
+//         return "iOS";
+//     }
+//     // Android
+//     if (/Android/i.test(ua)) {
+//         return "Android";
+//     }
+//     // Windows
+//     if (/Win/i.test(platform)) {
+//         return "Windows";
+//     }
+//     // macOS
+//     if (/Mac/i.test(platform)) {
+//         return "macOS";
+//     }
+//     // Linux（排除 Android）
+//     if (/Linux/i.test(platform)) {
+//         return "Linux";
+//     }
+//     return "Unknown";
+// }
+// console.log(getSystemType());
+
+// 拦截链接保证主页地址传输
 const addMark = (url) => {
     if (!url) return url
     if (url.includes('?domin='+domin)) return url
@@ -36,6 +64,7 @@ window.location.replace = function(url) {
     _replace.call(window.location, addMark(url))
 }
 
+// 基本逻辑
 function containsSubstring(mainStr, subStr, caseSensitive = true) {
     if (!caseSensitive) {
         mainStr = mainStr.toLowerCase();
@@ -43,16 +72,16 @@ function containsSubstring(mainStr, subStr, caseSensitive = true) {
     }
     return mainStr.indexOf(subStr) !== -1;
 }
-
-var temp = window.location.host;
-if(containsSubstring(temp,"tauri.localhost")){
-  var domin = temp;
+var temp = new URLSearchParams(window.location.search).get('domin')
+if (temp==null){
+    var domin = window.location.href
 }else{
-  let urlParams = new URLSearchParams(window.location.search); // window.location.href
-  console.log(urlParams);
-  var domin = urlParams.get('domin');
+    //var domin = getSystemType()
+    var domin = temp
 }
-//console.log(domin);
+console.log(window.location);
+console.log(domin);
+
 // 初始化跳转
 const hookClick = (e) => {
     const origin = e.target.closest('a')
@@ -84,70 +113,95 @@ document.addEventListener('click', hookClick, { capture: true })
 
 
 
-console.log('回到主页脚本已加载')
-
+// 主页按钮设计
 window.addEventListener('DOMContentLoaded', () => {
     const btn = document.createElement('div')
+    btn.innerText = '主页'
     btn.style.position = 'fixed'
-    btn.style.bottom = '20px'
+    btn.style.bottom = '30px'
     btn.style.right = '20px'
-    btn.style.width = '70px'
-    btn.style.height = '70px'
-    btn.style.backgroundColor = '#ff4757'
+    btn.style.width = '60px'
+    btn.style.height = '60px'
+    btn.style.background = 'rgba(255, 80, 80, 0.95)'
     btn.style.color = '#fff'
-    btn.style.borderRadius = '50%'
-    btn.style.display = 'flex'
-    btn.style.justifyContent = 'center'
-    btn.style.alignItems = 'center'
-    btn.style.fontSize = '14px'
+    btn.style.fontSize = '16px'
     btn.style.fontWeight = 'bold'
-    btn.style.cursor = 'pointer'
+    btn.style.display = 'flex'
+    btn.style.alignItems = 'center'
+    btn.style.justifyContent = 'center'
+    btn.style.borderRadius = '50%'
+    btn.style.zIndex = '99999'
     btn.style.userSelect = 'none'
+    btn.style.cursor = 'pointer'
     btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.25)'
-    btn.textContent = '主页'
-
     document.body.appendChild(btn)
 
     let isDragging = false
-    let offsetX = 0
-    let offsetY = 0
+    let moved = false
+    let startX = 0
+    let startY = 0
+    let originX = 0
+    let originY = 0
 
-    btn.addEventListener('mousedown', (e) => {
+    const start = (e) => {
+        const touch = e.touches ? e.touches[0] : e
+        isDragging = true
+        moved = false
+        startX = touch.clientX
+        startY = touch.clientY
+        originX = btn.offsetLeft
+        originY = btn.offsetTop
+    }
+
+    const move = (e) => {
+        if (!isDragging) return
+        const touch = e.touches ? e.touches[0] : e
+        const dx = touch.clientX - startX
+        const dy = touch.clientY - startY
+
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true
+
+        btn.style.left = originX + dx + 'px'
+        btn.style.top = originY + dy + 'px'
+        btn.style.right = 'auto'
+    }
+
+    const end = () => {
+        if (!isDragging) return
         isDragging = false
-        offsetX = e.clientX - btn.offsetLeft
-        offsetY = e.clientY - btn.offsetTop
 
-        const moveHandler = (e) => {
-            isDragging = true
-            btn.style.left = (e.clientX - offsetX) + 'px'
-            btn.style.top = (e.clientY - offsetY) + 'px'
-            btn.style.right = 'auto'
-            btn.style.bottom = 'auto'
-        }
-
-        const upHandler = () => {
-            document.removeEventListener('mousemove', moveHandler)
-            document.removeEventListener('mouseup', upHandler)
-
-            if (isDragging) {
-                const screenWidth = window.innerWidth
-                const btnCenter = btn.offsetLeft + btn.offsetWidth / 2
-
-                if (btnCenter < screenWidth / 2) {
-                    btn.style.left = '10px'
-                } else {
-                    btn.style.left = (screenWidth - btn.offsetWidth - 10) + 'px'
-                }
+        if (!moved) {
+            if (containsSubstring(domin,"file:///")){
+                window.history.go(-window.history.length + 1);
+            }else{
+            window.location.href = domin
             }
+            return
         }
 
-        document.addEventListener('mousemove', moveHandler)
-        document.addEventListener('mouseup', upHandler)
-    })
+        // 自动吸边
+        const screenW = window.innerWidth
+        const btnW = btn.offsetWidth
+        const currentLeft = btn.offsetLeft
 
-    btn.addEventListener('click', () => {
-        if (!isDragging) {
-            window.location.href = 'http://'+domin
-        }
-    })
+        const targetLeft = currentLeft + btnW / 2 < screenW / 2
+            ? 10
+            : screenW - btnW - 10
+
+        btn.style.transition = 'left 0.25s ease'
+        btn.style.left = targetLeft + 'px'
+
+        setTimeout(() => {
+            btn.style.transition = ''
+        }, 300)
+    }
+
+    btn.addEventListener('mousedown', start)
+    btn.addEventListener('touchstart', start)
+
+    window.addEventListener('mousemove', move)
+    window.addEventListener('touchmove', move)
+
+    window.addEventListener('mouseup', end)
+    window.addEventListener('touchend', end)
 })
